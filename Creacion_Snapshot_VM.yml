@@ -1,0 +1,17 @@
+---
+- hosts: all
+
+  tasks:
+  - name: Creacion de Snapshot de VM
+    vmware_guest_snapshot:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      datacenter: "{{ datacenter_name }}"
+      folder: "/{{ datacenter_name }}/vm/"
+      name: "{{ vm_name }}"
+      snapshot_name: "{{ snap_name }}"
+      description: "Snapshop creado por Ansible"
+      state: present      
+    delegate_to: localhost

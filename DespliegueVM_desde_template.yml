@@ -1,0 +1,44 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: Despliegue de VM desde template
+    vmware_guest:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"       # administrator@vsphere.local
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      folder: "{{ vm_folder }}"
+      name: "{{ vm_name }}"
+      template: "{{ vm_template }}"
+      disk:
+        size_gb: "{{ size }}"
+        type: thin
+        datastore: "{{ datastore }}"
+      hardware:
+        memory_mb: "{{ memory_mb }}"
+        num_cpus: "{{ num_cpus }}"
+        num_cpu_cores_per_socket: 3
+        scsi: paravirtual
+        memory_reservation_lock: True
+        mem_limit: 8096
+        mem_reservation: 4096
+        cpu_limit: 8096
+        cpu_reservation: 4096
+        max_connections: 5
+        hotadd_cpu: True
+        hotremove_cpu: True
+        hotadd_memory: False
+        version: 12                    # Hardware version de la virtual machine
+        boot_firmware: "efi"
+      cdrom:
+        type: iso
+        iso_path: "[datastore1] livecd.iso"
+      networks:
+        - name: VM Network
+          ip: 192.168.10.11
+          netmask: 255.255.255.0
+        - vlan: {{ vlan }} 
+      wait_for_ip_address: yes
+      delegate_to: localhost
