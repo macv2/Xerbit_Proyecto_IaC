@@ -11,5 +11,5 @@
       validate_certs: no
       datacenter: "{{ datacenter_name }}"
       name: "{{  item  }}"
-    loop: "{{ vm_names }}"
+    loop: "{{ vm_names_list }}"
     delegate_to: localhost
