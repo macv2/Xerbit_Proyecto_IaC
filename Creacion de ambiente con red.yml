@@ -22,5 +22,5 @@
           netmask: "{{ item.netmask }}"
         - vlan: {{ item.vlan }} 
       wait_for_ip_address: yes
-      loop: "{{ Parametros }}"
-      delegate_to: localhost
+    loop: "{{ Parametros }}"
+    delegate_to: localhost
