@@ -1,0 +1,26 @@
+---
+- name: Creacion de Ambiente con red
+  hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: Despliegue de VM desde template
+    vmware_guest:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"       # administrator@vsphere.local
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      folder: "{{ vm_folder }}"
+      name: "{{ item.vm_name }}"
+      template: "{{ item.vm_template }}"
+      hardware:
+        memory_mb: "{{ item.memory }}"
+        num_cpus: "{{ item.cpus }}"
+      networks:
+        - name: "{{ item.network }}"
+          ip: "{{ item.ip }}"
+          netmask: "{{ item.netmask }}"
+        - vlan: {{ item.vlan }} 
+      wait_for_ip_address: yes
+      loop: "{{ Parametros }}"
+      delegate_to: localhost
