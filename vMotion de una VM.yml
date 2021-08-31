@@ -1,0 +1,14 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: vMotion de una VM
+    vmware_vmotion:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: no
+      vm_name: "{{ vm_name }}"
+      destination_host: '{{ destination_hostname }}'
+    delegate_to: localhost  
