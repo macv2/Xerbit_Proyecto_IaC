@@ -16,5 +16,5 @@
       hardware:
         memory_mb: "{{ item.memory }}"
         num_cpus: "{{ item.cpus }}"
-      loop: "{{ Parametros }}"  
-      delegate_to: localhost
+    loop: "{{ Parametros }}"  
+    delegate_to: localhost
