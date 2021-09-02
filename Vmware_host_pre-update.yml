@@ -1,0 +1,27 @@
+---
+- name: Preparar host para update
+  hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: Apagar VMs
+    vmware_guest:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"       # administrator@vsphere.local
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      name: "{{ item }}"      
+      state: poweredoff
+    loop: "{{ vm_names_list }}"  
+    delegate_to: localhost
+    
+  - name: vMotion de una VM
+    vmware_vmotion:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: no
+      vm_name: "{{ item }}"
+      destination_host: '{{ destination_hostname }}'
+    loop: "{{ vm_names_list_vmotion }}  
+    delegate_to: localhost
