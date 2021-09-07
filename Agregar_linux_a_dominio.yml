@@ -1,0 +1,147 @@
+---
+- name: Agregar Server linux al dominio
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: configuracion de la red
+    lineinfile:
+      path: /etc/sysconfig/network-scripts/ifcfg-ens192
+      regexp: "{{ item.expresion }}"     
+      line: "{{ item.linea }}"
+      state: present
+    loop:
+    - {expresion: '^TYPE=', linea: 'TYPE=Ethernet' }
+    - {expresion: '^PROXY_METHOD=', linea: 'PROXY_METHOD=none'}
+    - {expresion: '^BROWSER_ONLY=', linea: 'BROWSER_ONLY=no'}
+    - {expresion: '^BOOTPROTO=', linea: 'BOOTPROTO=none'}
+    - {expresion: '^DEFROUTE=', linea: 'DEFROUTE=yes'}
+    - {expresion: '^IPV4_FAILURE_FATAL=', linea: 'IPV4_FAILURE_FATAL=no'}
+    - {expresion: '^ONBOOT=', linea: 'ONBOOT=yes'}
+    - {expresion: '^IPADDR=', linea: 'IPADDR=10.3.1.74'}
+    - {expresion: '^PREFIX=', linea: 'PREFIX=24'}
+    - {expresion: '^GATEWAY=', linea: 'GATEWAY=10.3.1.254'}
+    - {expresion: '^DNS1=', linea: 'DNS1=10.3.1.50'}
+    - {expresion: '^DNS2=', linea: 'DNS2=10.6.1.50'}
+    - {expresion: '^DOMAIN=', linea: 'DOMAIN=cevaldom.local'}
+
+  - name: Instalar paquetes
+    yum:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - realmd
+    - oddjob
+    - oddjob-mkhomedir
+    - sssd
+    - adcli
+    - openldap-clients
+    - policycoreutils-python
+    - samba-common
+    - samba-common-tools
+    - krb5-workstation  
+    notify:
+      - restart realmd
+
+#preguntar por ntpdate,ntp
+      
+      
+  - name: Verificar conexion 
+    command: realm discover cevaldom.local
+    register: respuesta_realm
+    failed_when: >
+      ("realm-name: CEVALDOM.LOCAL" not in result.stdout) or
+      ("client-software: sssd" not in result.stdout) or
+      ("oddjob" not in result.stdout) or
+      ("oddjob-mkhomedir" not in result.stdout) or
+      ("oddjob-mkhomedir" not in result.stdout) or
+      ("samba-common-tools" not in result.stdout) or
+      ("adcli" not in result.stdout)
+
+      
+   
+  - name: Agregar maquina al AD  
+    expect:
+      command: realm join --verbose -U 'lsosa@cevaldom.local' cevaldom.local
+      responses:
+        Password for *: "{{ contraseña }}"
+    become: yes
+    register: respuesta_realm        
+
+#alternativas
+# command: /bin/bash -c "/usr/sbin/realm join -U 'lsosa@cevaldom.local' --computer-ou=OU=Linux,OU=Servers,DC=CEVALDOM,DC=LOCAL cevaldom.local"
+
+# command: realm join -U 'lsosa@cevaldom.local' --computer-ou=OU=Linux,OU=Servers,DC=CEVALDOM,DC=LOCAL cevaldom.local
+
+
+  - name: Cambiar permisos de sssd.conf
+    file:
+      path: /etc/sssd/sssd.conf
+      state: file
+      owner: root
+      group: root
+      mode: "0600"
+    notify:
+      - restart sssd  
+
+
+  - name: Editar lineas en sssd.conf
+    lineinfile:
+      path: /etc/sssd/sssd.conf
+      regexp: "{{ item.expresion }}"     
+      line: "{{ item.linea }}"
+      state: present
+    loop:
+    - {expresion: '^use_fully_qualified_names ', linea: 'use_fully_qualified_names = False' }
+    - {expresion: '^fallback_homedir ', linea: 'fallback_homedir = /home/%u@'}
+
+
+  - name: Agregar lineas a sssd.conf 
+    lineinfile:
+      path: /etc/sssd/sssd.conf
+      line: "{{ item }}"
+      state: present
+    loop:
+      - krb5_validate = False
+      - ad_enable_gc = false
+      - ldap_rfc2307_fallback_to_local_users = True
+      - enumerate = false
+      - ldap_use_tokengroups=false
+    notify:
+      - restart sssd
+ 
+#alternativa 
+  - name: Agregar lineas a sssd.conf
+    blockinfile:
+      path: /etc/sssd/sssd.conf
+      block: |
+            krb5_validate = False
+            ad_enable_gc = false
+            ldap_rfc2307_fallback_to_local_users = True
+            enumerate = false
+            ldap_use_tokengroups=false
+    notify:
+      - restart sssd    
+      
+
+  - name: permitir que el grupo LinuxAdmins se loguee en el sistema
+    command: /bin/bash -c "/usr/sbin/realm permit -g LinuxAdmins@cevaldom.local"
+    register: respuesta_realm_permit   
+
+  - name: Agregar el grupo LinuxAdmins a sudoers
+    lineinfile:
+      dest: /etc/sudoers
+      line: '%LinuxAdmins@cevaldom.local        ALL=(ALL)       ALL'
+      insertafter: '^%wheel'
+
+###############################
+  handlers:
+  - name: restart realmd
+    service:
+      name: realmd
+      state: restarted
+
+  - name: restart sssd
+    service:
+      name: sssd
+      state: restarted
