@@ -1,0 +1,37 @@
+---
+- name: API Test  
+  hosts: all
+
+  tasks:
+  - name: get json con el assetID
+    uri:
+      url: https://insightvm.cevaldom.local:3780/api/3/assets/search
+      #user: your_username
+      #password: your_pass
+      #force_basic_auth: yes
+      method: POST
+      body: >
+            {
+             "filters": [
+                  { 
+                     "field": "host-name", 
+                    "operator": "is", 
+                    "value": "{{ ansible_nodename }}",
+                  }
+                ],
+                "match": "all"
+             }
+      body_format: json
+      status_code: 200
+    delegate_to: localhost
+    register: resultassetId
+    
+  - name: optener el asset id
+    set_fact:
+      assetId: "{{ resultassetId.json.resources[0].id }}"                         #jsondata: "{{ resultassetId.stdout | from_json }}"
+      
+  - name: Mostrar assetId
+    debug: 
+      msg: "El asset id es: {{ assetId }}"
+      
+############################################################## 
