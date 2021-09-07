@@ -1,0 +1,27 @@
+---
+- name: vMotion de todas las VM de un host
+  hosts: all
+  gather_facts: no
+  
+  tasks:
+  - name: Obtener VMs info
+    vmware_vm_info:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      vm_type: vm
+    delegate_to: localhost
+    register: lista
+	   
+  - name: vMotion de VMs
+    vmware_vmotion:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: no
+      vm_name: "{{ item.guest_name }}"
+      destination_host: '{{ destination_hostname }}'
+    when: {{ item.power_state }} == "poweredOn" and  {{ item.guest_name }} = ""
+    loop: "{{ lista.virtual_machines }}"
+    delegate_to: localhost
+    
