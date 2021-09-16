@@ -6,8 +6,8 @@
   - name: get json con el assetID
     uri:
       url: https://10.3.1.43:3780/api/3/assets/search
-      user: {{ username }}
-      password: {{ password }}
+      user: "{{ username }}"
+      password: "{{ password }}"
       force_basic_auth: yes
       method: POST
       body: >
@@ -38,8 +38,8 @@
   - name: get json con Vulnerability
     uri:
       url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities
-      user: {{ username }}
-      password: {{ password }}
+      user: "{{ username }}"
+      password: "{{ password }}"
       force_basic_auth: yes
       method: GET
       body_format: json
@@ -59,8 +59,8 @@
   - name: get json con solution
     uri:
       url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities/{vulnerabilityId}/solution 
-      user: {{ username }}
-      password: {{ password }}
+      user: "{{ username }}"
+      password: "{{ password }}"
       force_basic_auth: yes
       method: GET
       body_format: json
