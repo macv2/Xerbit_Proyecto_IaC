@@ -17,7 +17,7 @@
                   { 
                      "field": "host-name", 
                     "operator": "is", 
-                    "value": "{{ ansible_nodename }}",
+                    "value": "{{ hostname }}",
                   }
                 ],
                 "match": "all"
