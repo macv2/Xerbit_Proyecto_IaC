@@ -5,10 +5,10 @@
   tasks:
   - name: get json con el assetID
     uri:
-      url: https://www.mockbin.org/bin/c923c1d0-928e-462e-a6fb-bb0f6226791c       #cambiar a https://Rapip7hostname:3780/api/3/assets/search
-      #user: your_username
-      #password: your_pass
-      #force_basic_auth: yes
+      url: https://10.3.1.43:3780/api/3/assets/search
+      user: {{ username }}
+      password: {{ password }}
+      force_basic_auth: yes
       method: POST
       body: >
             {
@@ -37,10 +37,10 @@
 ##############################################################       
   - name: get json con Vulnerability
     uri:
-      url: https://www.mockbin.org/bin/2a379940-214c-4a04-88c2-32fb3b3f2415       #cambiar a https://Rapip7hostname:3780/api/3/assets/{id}/vulnerabilities
-      #user: your_username
-      #password: your_pass
-      #force_basic_auth: yes
+      url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities
+      user: {{ username }}
+      password: {{ password }}
+      force_basic_auth: yes
       method: GET
       body_format: json
       status_code: 200
@@ -58,10 +58,10 @@
 ##############################################################       
   - name: get json con solution
     uri:
-      url: https://www.mockbin.org/bin/25ad8baf-a58c-41a3-9034-f88251009fb1       #cambiar a https://Rapip7hostname:3780/api/3/assets/{id}/vulnerabilities/{vulnerabilityId}/solution 
-      #user: your_username
-      #password: your_pass
-      #force_basic_auth: yes
+      url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities/{vulnerabilityId}/solution 
+      user: {{ username }}
+      password: {{ password }}
+      force_basic_auth: yes
       method: GET
       body_format: json
       status_code: 200
