@@ -5,10 +5,11 @@
   tasks:
   - name: get json con el assetID
     uri:
-      url: https://10.3.1.43:3780/api/3/assets/search
+      url: https://insightvm.cevaldom.local:3780/api/3/assets/search
       user: "{{ username }}"
       password: "{{ password }}"
       force_basic_auth: yes
+      validate_certs: no
       method: POST
       body: >
             {
@@ -37,10 +38,11 @@
 ##############################################################       
   - name: get json con Vulnerability
     uri:
-      url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities
+      url: https://insightvm.cevaldom.local:3780/api/3/assets/{id}/vulnerabilities
       user: "{{ username }}"
       password: "{{ password }}"
       force_basic_auth: yes
+      validate_certs: no
       method: GET
       body_format: json
       status_code: 200
@@ -58,10 +60,11 @@
 ##############################################################       
   - name: get json con solution
     uri:
-      url: https://10.3.1.43:3780/api/3/assets/{id}/vulnerabilities/{vulnerabilityId}/solution 
+      url: https://insightvm.cevaldom.local:3780/api/3/assets/{id}/vulnerabilities/{vulnerabilityId}/solution 
       user: "{{ username }}"
       password: "{{ password }}"
       force_basic_auth: yes
+      validate_certs: no
       method: GET
       body_format: json
       status_code: 200
