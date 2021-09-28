@@ -1,0 +1,52 @@
+---
+- name: Obtener y Hacer Buuild en Pre-Produccion
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: git feth
+    - git:
+      repo: '10.2.14.5:~/repos/cvdpwebpage.git'
+      dest: /opt/cvdpwebpage
+
+  - name: Instalar "web app"
+    npm:
+      name: ????
+      path: /app/location
+
+  - name: Hacer de Build la aplicacion
+    command: ng build {{ proyecto.name }} -c=staging --aot --vendor-chunk --common-chunk --delete-output-path --buildOptimizer --subresource-integrity
+
+  - name: scp
+    command: "scp -rv dist/browser/* ironman@{{ proyecto.ip }}:~/{{ proyecto.name }}"
+
+
+#cambio de server  ###########################################################  
+
+
+  tasks:    
+  - name: Detener Apache 
+    service:
+      name: httpd
+      state: stopped
+       
+     
+  - name: remove directory
+    file:
+      path: /var/www/html/{{ proyecto.name }}/
+      state: absent
+       
+
+  - name: Copiar directorio asignando owner y permisos
+    copy:
+      src: /web-public
+      dest: /var/www/html/{{ proyecto.name }}/
+      owner: apache
+      group: apache
+        
+
+  - name: Arracar Apache
+    service:
+      name: httpd
+      state: started     
+       
