@@ -1,5 +1,5 @@
 ---
-- name: Obtener y Hacer Buuild en Pre-Produccion
+- name: Desplegar en Pre-Produccion
   hosts: all
   become: yes
 
