@@ -11,7 +11,7 @@
 
   - name: Instalar "web app"
     npm:
-      name: ????
+      name: web
       path: /app/location
 
   - name: Hacer de Build la aplicacion
